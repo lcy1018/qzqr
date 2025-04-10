@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>电子签名页面</title>
+    <!-- 引入签名库 -->
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <style>
+        #signature-pad {
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+        .button-group { margin-top: 20px; }
+        button { padding: 10px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h3>请在下方手写签名</h3>
+    <canvas id="signature-pad" width="500" height="200"></canvas>
+    <div class="button-group">
+        <button onclick="saveSignature()">保存签名</button>
+        <button onclick="clearSignature()">清空重签</button>
+    </div>
+    <div id="linkContainer" style="margin-top: 20px; display: none;">
+        <p>签名已保存！请复制以下链接到表格：</p>
+        <input type="text" id="signatureLink" style="width: 500px;" readonly>
+    </div>
+
+    <script>
+        // 初始化签名板
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas);
+        
+        // 保存签名
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                alert("请先签名！");
+                return;
+            }
+
+            // 生成签名图片的Base64数据
+            const dataURL = signaturePad.toDataURL();
+            
+            // 生成唯一签名链接（示例：假设记录ID为123）
+            const recordId = new URLSearchParams(window.location.search).get('record_id') || 'default';
+            const signatureLink = `${window.location.origin}${window.location.pathname}?record_id=${recordId}&signature=${encodeURIComponent(dataURL)}`;
+            
+            // 显示链接
+            document.getElementById('signatureLink').value = signatureLink;
+            document.getElementById('linkContainer').style.display = 'block';
+        }
+
+        // 清空签名
+        function clearSignature() {
+            signaturePad.clear();
+            document.getElementById('linkContainer').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
